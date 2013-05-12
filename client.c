@@ -37,7 +37,6 @@ int main(int argc, char *argv[]){
 	char buffer[1500];
 	socklen_t len = sizeof(serv_addr);	
 
-//	memset((char *) &serv_addr, 0, sizeof(serv_addr));
 	serv_addr->sin_family = PF_INET;
 	serv_addr->sin_addr.s_addr = inet_addr(argv[1]);
 	serv_addr->sin_port = htons(PORT_TFTP);
@@ -49,12 +48,25 @@ int main(int argc, char *argv[]){
 
 	start_connexion(argv[2], argv[3], argv[4], sockfd, serv_addr);
 
+	if(strcmp(argv[2], "RRQ") == 0){
+		char *write_buffer = calloc(sizeof(char), 516);
+		
+		while(1){
+			//FILE *write_file = fopen(argv[3], "a+");
+			read_data_with_ACK(write_buffer, sockfd, serv_addr);
+			if(strlen(write_buffer) == 511){
+				//Écriture dans le fichier à faire ici
+			}else{
+				//Fin de l'écriture avec le dernier morceau
+			}
+			//fclose(write_file);
+		}
+	}else if(strcmp(argv[2], "WRQ") == 0){
+		
+	} 
+
 	return;
 	/*
-	if((n = sendto(sockfd, filename, strlen(filename), 0, (struct sockaddr *) &serv_addr, sizeof(serv_addr))) != strlen(filename)){
-		perror("Sendto error : ");
-		exit(1);
-	}
 
 	if(strcmp(mode,"RRQ\0") == 0){
 		char write_buffer[512] = "";

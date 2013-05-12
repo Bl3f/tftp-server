@@ -42,18 +42,38 @@ char *recv_data(int sockfd, char *buffer, size_t len, int flags, struct sockaddr
 	int n;	
 	socklen_t len_addr = sizeof(*serv_addr);
 
-	if((n = recvfrom(sockfd, buffer, 511, 0, (struct sockaddr *) serv_addr, &len_addr)) < 0){
+	if((n = recvfrom(sockfd, buffer, len, 0, (struct sockaddr *) serv_addr, &len_addr)) < 0){
 		perror("Recv error ");
 		exit(1);
 	}
 	buffer[n] = '\0';
 
-	return 0;
 }
 
 int read_data_connexion(request_connexion *data_co, char *buffer){
 	int end_index = strrchr(buffer, '0') - buffer;	
-	data_co->type = buffer[0];
-	printf("%d\n", buffer[0]);
+	
+	data_co->type = ((char) buffer[0])-'0';
 	strcpy(data_co->mode, buffer+end_index+1);
+	buffer[strlen(buffer)-6] = '\0';
+	strcpy(data_co->filename, buffer+1);
+}
+
+int send_data_with_ACK(char *buffer, short num_ACK, int sockfd, struct sockaddr_in *serv_addr){
+	char *real_data = calloc(sizeof(char), 516);
+	sprintf(real_data, "%2d%2d%s", 3, num_ACK, buffer);
+	send_data(sockfd, real_data, serv_addr);
+}
+
+int wait_ACK(short num_ACK, int sockfd, struct sockaddr_in *serv_addr){
+	return 0;
+}
+
+int read_data_with_ACK(char *buffer, int sockfd, struct sockaddr_in *serv_addr){
+	recv_data(sockfd, buffer, 515, 0, serv_addr);
+	strcpy(buffer, buffer + 4);
+}
+
+int send_ACK(short num_ACK, int sockfd, struct sockaddr_in *serv_addr){
+	return 0;
 }
