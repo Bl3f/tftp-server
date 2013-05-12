@@ -15,22 +15,21 @@ int main(int argc, char *argv[]){
 
 	int port = PORT_TFTP;
 	int sockfd,  n;
-	struct sockaddr_in serv_addr;	
-	socklen_t len = sizeof(serv_addr);
-	char *buffer = calloc(sizeof(char), 255);
+	struct sockaddr_in *serv_addr = malloc(sizeof(struct sockaddr_in));	
+	char *buffer = calloc(sizeof(char), 512);
+	request_connexion *data_co = malloc(sizeof(request_connexion));
 
-	memset((char *) &serv_addr, 0, sizeof(serv_addr));
-	serv_addr.sin_family = PF_INET;
-	serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-	serv_addr.sin_port = htons(port);
+	serv_addr->sin_family = PF_INET;
+	serv_addr->sin_addr.s_addr = htonl(INADDR_ANY);
+	serv_addr->sin_port = htons(port);
 
 	if((sockfd = socket(PF_INET, SOCK_DGRAM, 0)) < 0){
-		perror("Socket error : ");
+		perror("Socket error ");
 		exit(1);
 	}
 
-	if(bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0){
-		perror("Bind error: ");
+	if(bind(sockfd, (struct sockaddr *) serv_addr, sizeof(*serv_addr)) < 0){
+		perror("Bind error ");
 		exit(1);
 	}
 
@@ -38,19 +37,12 @@ int main(int argc, char *argv[]){
 	while(1){
 		//send_data(sockfd, buffer, sizeof(buffer)-1, 0, (struct sockaddr *) &serv_addr, &len);	
 
-		//recv_data(sockfd, &buffer, sizeof(buffer)-1, 0, (struct sockaddr *) &serv_addr, &len);
+		recv_data(sockfd, buffer, sizeof(*buffer)-1, 0, serv_addr);
 
-		if((n = recvfrom(sockfd, buffer, sizeof(buffer)-1, 0, (struct sockaddr *) &serv_addr, &len)) < 0){
-			perror("Recv error ");
-			exit(1);
-		}
-		buffer[n] = '\0';
-		printf("%s\n", buffer);
-		return 0;		
+		read_data_connexion(data_co, buffer);
+		printf("A client is now connected\n");
 
-		printf("We have a client connection on the server.\n");
-
-		char *welcome = (char *) "Welcome on the TFTP server. You can read (RRQ) or write (WRQ) a file on this server. What do you do ? [RRQ/WRQ]";
+		/*char *welcome = (char *) "Welcome on the TFTP server. You can read (RRQ) or write (WRQ) a file on this server. What do you do ? [RRQ/WRQ]";
 		if((n = sendto(sockfd, welcome, strlen(welcome), 0, (struct sockaddr *) &serv_addr, sizeof(serv_addr))) < 0){
 			perror("Sendto error : ");
 			exit(1);
@@ -123,6 +115,7 @@ int main(int argc, char *argv[]){
 				exit(1);
 			}
 		}
+	}*/
 	}
 	close(sockfd);
 }

@@ -40,13 +40,20 @@ int send_data(int sockfd, const void *buffer, struct sockaddr_in *serv_addr){
 
 char *recv_data(int sockfd, char *buffer, size_t len, int flags, struct sockaddr_in *serv_addr){
 	int n;	
+	socklen_t len_addr = sizeof(*serv_addr);
 
-	if((n = recvfrom(sockfd, buffer, sizeof(buffer)-1, 0, (struct sockaddr *) serv_addr, (socklen_t *) sizeof(*serv_addr))) < 0){
-		perror("Recv error : ");
+	if((n = recvfrom(sockfd, buffer, 511, 0, (struct sockaddr *) serv_addr, &len_addr)) < 0){
+		perror("Recv error ");
 		exit(1);
 	}
 	buffer[n] = '\0';
 
-	printf("%s\n", buffer);	
 	return 0;
+}
+
+int read_data_connexion(request_connexion *data_co, char *buffer){
+	int end_index = strrchr(buffer, '0') - buffer;	
+	data_co->type = buffer[0];
+	printf("%d\n", buffer[0]);
+	strcpy(data_co->mode, buffer+end_index+1);
 }
