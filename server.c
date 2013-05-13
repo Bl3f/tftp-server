@@ -18,7 +18,8 @@ int main(int argc, char *argv[]){
 	struct sockaddr_in *serv_addr = malloc(sizeof(struct sockaddr_in));	
 	char *buffer = calloc(sizeof(char), 512); //Buffer de dialogue de taille 512
 	request_connexion *data_co = malloc(sizeof(request_connexion)); //Structure des informations de connexions
-
+	char *read_buffer = calloc(sizeof(char), 512);
+	
 	//Initialisation des paramètres du serveur
 	serv_addr->sin_family = PF_INET;
 	serv_addr->sin_addr.s_addr = htonl(INADDR_ANY);
@@ -45,11 +46,11 @@ int main(int argc, char *argv[]){
 
 		if(data_co->type == 1){ //RRQ operation
 			FILE *file = fopen("lorem.txt", "r");
-			char *read_buffer = calloc(sizeof(char), 512);
 			int size;
 			short ACK_cpt = 0;
 
 			while((size = fread(read_buffer, sizeof(char), 512, file)) != 0){
+				read_buffer[size] = '\0';
 				send_data_with_ACK(read_buffer, ACK_cpt, sockfd, serv_addr);
 				while(wait_ACK(ACK_cpt, sockfd, serv_addr) != 0){
 					send_data_with_ACK(read_buffer, ACK_cpt, sockfd, serv_addr);
@@ -138,4 +139,8 @@ int main(int argc, char *argv[]){
 	}*/
 	}
 	close(sockfd);
+	free(serv_addr);
+	free(data_co);
+	free(buffer);
+	return 0;
 }

@@ -35,6 +35,7 @@ int main(int argc, char *argv[]){
 	int sockfd, n;
 	struct sockaddr_in *serv_addr = (struct sockaddr_in *)malloc(sizeof(struct sockaddr_in));
 	char buffer[1500];
+	char *write_buffer = calloc(sizeof(char), 516);
 	socklen_t len = sizeof(serv_addr);	
 
 	serv_addr->sin_family = PF_INET;
@@ -49,23 +50,26 @@ int main(int argc, char *argv[]){
 	start_connexion(argv[2], argv[3], argv[4], sockfd, serv_addr);
 
 	if(strcmp(argv[2], "RRQ") == 0){
-		char *write_buffer = calloc(sizeof(char), 516);
-		
+		FILE *write_file = fopen(argv[3], "w");
+		fclose(write_file);
 		while(1){
-			//FILE *write_file = fopen(argv[3], "a+");
+			FILE *write_file = fopen(argv[3], "a+");
 			read_data_with_ACK(write_buffer, sockfd, serv_addr);
 			if(strlen(write_buffer) == 511){
-				//Écriture dans le fichier à faire ici
+				//Écriture dans le fichier
+				fwrite(write_buffer, sizeof(char), 511, write_file);
 			}else{
 				//Fin de l'écriture avec le dernier morceau
+				fwrite(write_buffer, sizeof(char), strlen(write_buffer), write_file);
+				fclose(write_file);
+				return 0;
 			}
-			//fclose(write_file);
+			fclose(write_file);
 		}
 	}else if(strcmp(argv[2], "WRQ") == 0){
 		
 	} 
 
-	return;
 	/*
 
 	if(strcmp(mode,"RRQ\0") == 0){
@@ -95,5 +99,7 @@ int main(int argc, char *argv[]){
 	}
 	
 	close(sockfd);*/
+	free(serv_addr);
+	free(write_buffer);
 	return 0;
 }
