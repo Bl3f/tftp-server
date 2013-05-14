@@ -68,45 +68,22 @@ int main(int argc, char *argv[]){
 			fclose(write_file);
 		}
 	}else if(strcmp(argv[2], "WRQ") == 0){
+		short ACK_cpt = 0;
+		wait_ACK(ACK_cpt, sockfd, serv_addr);
+		ACK_cpt++;
 		FILE *read_file = fopen(argv[3], "r");
 		int size;
-		short ACK_cpt = 0;
-			while((size = fread(read_buffer, sizeof(char), 512, read_file))){
-				read_buffer[size] = '\0';
-					
+			while((size = fread(read_buffer, sizeof(char), 512, read_file) != 0)){
+				send_data_with_ACK(read_buffer, ACK_cpt, sockfd, serv_addr);
+				while(wait_ACK(ACK_cpt, sockfd, serv_addr) != 0){
+					send_data_with_ACK(read_buffer, ACK_cpt, sockfd, serv_addr);
+				}
+				ACK_cpt++;
+				memset(read_buffer, '\0', 511);
 			}
-		close(read_file);	
+		fclose(read_file);
 	} 
 
-	/*
-
-	if(strcmp(mode,"RRQ\0") == 0){
-		char write_buffer[512] = "";
-		int ack_cpt = 0;		
-
-		while(1){
-			FILE *write_file = fopen(filename, "a+");
-			if((n = recvfrom(sockfd, write_buffer, sizeof(write_buffer)-1, 0, (struct sockaddr *) &serv_addr, &len)) < 0){
-				perror("Recv error : ");
-				exit(1);
-			}
-			write_buffer[n] = '\0';
-		
-			fprintf(write_file, "%s", write_buffer);
-			ack_cpt++;
-			
-			sprintf(buffer, "%d\0", ack_cpt);
-
-			if((n = sendto(sockfd, buffer, strlen(buffer), 0, (struct sockaddr *) &serv_addr, sizeof(serv_addr))) < 0){
-				perror("Sendto error : ");
-				exit(1);
-			}
-			fclose(write_file);
-		}
-		
-	}
-	
-	close(sockfd);*/
 	free(serv_addr);
 	free(write_buffer);
 	return 0;
