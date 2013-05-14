@@ -10,26 +10,26 @@ Installation
 
 1. Pour l'installation du client, récupérer le dossier *client*
 
-     make client
+>make client
 
 2. Pour l'installation du serveur, récupérer le dossier *server*
 
-     make server
+>make server
 
 3. Pour désinstaller
 
-     make clean
+>make clean
 
 Usage
 -----
 
 * Pour le client il faut spécifier les paramètres du transfert
 
-     ./client @IPServer (RRQ/WRQ) filename octet
+>./client @IPServer (RRQ/WRQ) filename octet
 
 * Pour le serveur il est nécessaire d'être administrateur pour exécuter le programme
 
-     sudo ./server
+>sudo ./server
 
 Authors
 =======
