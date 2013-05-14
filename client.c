@@ -36,6 +36,7 @@ int main(int argc, char *argv[]){
 	struct sockaddr_in *serv_addr = (struct sockaddr_in *)malloc(sizeof(struct sockaddr_in));
 	char buffer[1500];
 	char *write_buffer = calloc(sizeof(char), 516);
+	char *read_buffer = calloc(sizeof(char), 512);
 	socklen_t len = sizeof(serv_addr);	
 
 	serv_addr->sin_family = PF_INET;
@@ -67,7 +68,14 @@ int main(int argc, char *argv[]){
 			fclose(write_file);
 		}
 	}else if(strcmp(argv[2], "WRQ") == 0){
-		
+		FILE *read_file = fopen(argv[3], "r");
+		int size;
+		short ACK_cpt = 0;
+			while((size = fread(read_buffer, sizeof(char), 512, read_file))){
+				read_buffer[size] = '\0';
+					
+			}
+		close(read_file);	
 	} 
 
 	/*

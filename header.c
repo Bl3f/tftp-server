@@ -75,7 +75,6 @@ int wait_ACK(short num_ACK_waited, int sockfd, struct sockaddr_in *serv_addr){
 	recv_data(sockfd, num_ACK_received, 2, 0, serv_addr);
 
 	if(atoi(num_ACK_received) == num_ACK_waited){
-		printf("Youpi\n");
 		return 0;
 		free(num_ACK_received);
 	}else{

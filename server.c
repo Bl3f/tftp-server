@@ -45,7 +45,7 @@ int main(int argc, char *argv[]){
 		printf("A client is now connected\n");
 
 		if(data_co->type == 1){ //RRQ operation
-			FILE *file = fopen("lorem.txt", "r");
+			FILE *file = fopen(data_co->filename, "r");
 			int size;
 			short ACK_cpt = 0;
 
